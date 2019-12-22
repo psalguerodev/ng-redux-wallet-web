@@ -1,25 +1,25 @@
 <div class="page-body-wrapper full-page-wrapper auth-page">
   <div class="content-wrapper d-flex align-items-center auth register-bg-1 theme-one">
     <div class="row w-100">
-      <div class="col-lg-4 mx-auto">
-        <h2 class="text-center mb-4">Registro</h2>
+      <div class="col-lg-5 mx-auto">
+        <h2 class="text-center mb-5">Registro</h2>
         <div class="auto-form-wrapper">
-          <form action="#">
+          <form #form="ngForm" name="form" (ngSubmit)="onSubmit(form.value)">
             <div class="form-group">
               <div class="input-group">
-                <input type="email" class="form-control" placeholder="Correo">
+                <!-- Email -->
+                <input
+                  type="email"
+                  name="email"
+                  class="form-control"
+                  placeholder="Correo"
+                  #emailRef="ngModel"
+                  [email]="true"
+                  [(ngModel)]="email"
+                  required>
+
                 <div class="input-group-append">
-                  <span class="input-group-text">
-                    <i class="fa fa-check-circle"></i>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input type="password" class="form-control" placeholder="Password">
-                <div class="input-group-append">
-                  <span class="input-group-text">
+                  <span class="input-group-text" [ngClass]="{ 'text-success': emailRef.valid }">
                     <i class="fa fa-check-circle"></i>
                   </span>
                 </div>
@@ -27,7 +27,53 @@
             </div>
 
             <div class="form-group">
-              <button class="btn btn-primary submit-btn btn-block">Crear cuenta</button>
+              <div class="input-group">
+                <!-- Name -->
+                <input
+                  type="text"
+                  name="fullname"
+                  class="form-control"
+                  placeholder="Nombres"
+                  #fullnameRef="ngModel"
+                  [(ngModel)]="fullname"
+                  required>
+
+                <div class="input-group-append">
+                  <span class="input-group-text" [ngClass]="{ 'text-success': fullnameRef.valid }">
+                    <i class="fa fa-check-circle"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="input-group">
+                <!-- Password -->
+                <input
+                  type="password"
+                  name="password"
+                  class="form-control"
+                  placeholder="Contraseña"
+                  #passwordRef="ngModel"
+                  [(ngModel)]="password"
+                  required>
+
+
+                <div class="input-group-append">
+                  <span class="input-group-text" [ngClass]="{ 'text-success': passwordRef.valid }">
+                    <i class="fa fa-check-circle"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <button
+                class="btn btn-primary submit-btn btn-block"
+                [disabled]="form.invalid"
+                type="submit">
+                Crear cuenta
+              </button>
             </div>
             <div class="text-block text-center my-3">
               <span class="text-small font-weight-semibold">ya tienes una cuenta?</span>
