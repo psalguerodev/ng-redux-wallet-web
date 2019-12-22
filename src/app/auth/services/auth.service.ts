@@ -3,10 +3,14 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import * as firebase from 'firebase';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 import { User } from '../model/user.model';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/app.reducer';
+import { SetEnableLoadingAction, SetDisableLoadingAction } from '../../shared/sidebar/ui.actions';
+import { SetUserAction } from '../ngrx/auth.actions';
 
 export interface UserRegisterDto {
   id?: string;
@@ -26,20 +30,36 @@ export interface UserLoginDto {
 })
 export class AuthService {
 
-  user: firebase.User;
+  private currentUserSubscription: Subscription = new Subscription();
 
   constructor(
     private router: Router,
+    private store: Store<AppState>,
     private firestore: AngularFirestore,
     private authFire: AngularFireAuth) { }
 
   initAuthentication(): void {
     this.authFire.authState.subscribe((user: firebase.User) => {
-      console.log('user state :: ', user);
+      console.info('user state ::: ', user);
+
+      if ( user ) {
+
+        this.currentUserSubscription = this.firestore.doc(`${user.uid}/user`)
+          .valueChanges()
+          .subscribe( (user: User) => {
+            console.info('User firestore ::: ' , user);
+            this.store.dispatch(new SetUserAction(user));
+          })
+
+      } else {
+        this.currentUserSubscription.unsubscribe();
+      }
+
     });
   }
 
   createUser(user: UserRegisterDto): void {
+    this.store.dispatch( new SetEnableLoadingAction() );
     this.authFire
       .auth
       .createUserWithEmailAndPassword(user.email, user.password)
@@ -52,16 +72,18 @@ export class AuthService {
 
         this.firestore.doc(`${userDocument.uid}/user`).set(userDocument);
         this.goToRoute('dashboard');
+        this.store.dispatch( new SetDisableLoadingAction() );
 
       })
       .catch((error: any) => this.handlerError(error.message || 'Error'));
   }
 
   login(user: UserLoginDto): void {
+    this.store.dispatch( new SetEnableLoadingAction() );
     this.authFire.auth.signInWithEmailAndPassword(user.email, user.password)
       .then((userCredentials: firebase.auth.UserCredential) => {
-        this.user = userCredentials.user;
         this.goToRoute('dashboard');
+        this.store.dispatch( new SetDisableLoadingAction() );
       })
       .catch(error => this.handlerError(error.message || 'Error'));
   }
@@ -72,12 +94,14 @@ export class AuthService {
 
   private handlerError(error: string) {
     console.log(error);
-    Swal.fire('Ocurrió un error', error, 'error')
+    Swal.fire('Ocurrió un error', error, 'error');
+    this.store.dispatch( new SetDisableLoadingAction() );
   }
 
   logout() {
     this.goToRoute('login');
     this.authFire.auth.signOut();
+    this.store.dispatch(new SetUserAction(null));
   }
 
   isAuthenticate(): Observable<boolean> {
@@ -85,7 +109,7 @@ export class AuthService {
       .pipe(
         map((userCredentials: firebase.User) => {
           const user = (userCredentials != null);
-          if ( !user ) this.goToRoute('login');
+          if ( !user ) { this.goToRoute('login'); }
           return user;
         })
       );

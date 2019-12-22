@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService, UserRegisterDto } from '../services/auth.service';
-import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/app.reducer';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'psalguerodev-register',
@@ -8,22 +10,30 @@ import { Router } from '@angular/router';
   styleUrls: ['./register.component.css'],
   providers: [AuthService]
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, OnDestroy {
 
   email: string;
   fullname: string;
   password: string;
 
+  loading: boolean;
+  storeSubscription: Subscription;
+
   constructor(
-    private router: Router,
+    private store: Store<AppState>,
     private authService: AuthService) { }
 
   ngOnInit() {
+    this.storeSubscription = this.store.select('ui')
+      .subscribe((uiState) => this.loading = uiState.isLoading );
+  }
+
+  ngOnDestroy() {
+    if (this.storeSubscription) this.storeSubscription.unsubscribe();
   }
 
   onSubmit(formValue: UserRegisterDto): void {
     this.authService.createUser(formValue);
   }
-
 
 }
