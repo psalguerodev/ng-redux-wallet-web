@@ -11,6 +11,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.reducer';
 import { SetEnableLoadingAction, SetDisableLoadingAction } from '../../shared/sidebar/ui.actions';
 import { SetUserAction } from '../ngrx/auth.actions';
+import { LoggerService } from '../../shared/services/logger.service';
 
 export interface UserRegisterDto {
   id?: string;
@@ -31,71 +32,79 @@ export interface UserLoginDto {
 export class AuthService {
 
   private currentUserSubscription: Subscription = new Subscription();
+  private user: User;
 
   constructor(
     private router: Router,
     private store: Store<AppState>,
     private firestore: AngularFirestore,
+    private logger: LoggerService,
     private authFire: AngularFireAuth) { }
 
   initAuthentication(): void {
     this.authFire.authState.subscribe((user: firebase.User) => {
-      console.info('user state ::: ', user);
+      this.logger.log('user state ::: ', user);
 
-      if ( user ) {
+      if (user) {
 
         this.currentUserSubscription = this.firestore.doc(`${user.uid}/user`)
           .valueChanges()
-          .subscribe( (user: User) => {
-            console.info('User firestore ::: ' , user);
+          .subscribe((user: User) => {
+            this.user = user;
+            this.logger.log('User firestore ::: ', user);
             this.store.dispatch(new SetUserAction(user));
           })
 
       } else {
+        this.user = null;
         this.currentUserSubscription.unsubscribe();
       }
 
     });
   }
 
+  getUser(): User {
+    return this.user;
+  }
+
   createUser(user: UserRegisterDto): void {
-    this.store.dispatch( new SetEnableLoadingAction() );
+    this.store.dispatch(new SetEnableLoadingAction());
     this.authFire
       .auth
       .createUserWithEmailAndPassword(user.email, user.password)
       .then((userCredential: firebase.auth.UserCredential) => {
         const userDocument: User = {
-          fullaname: user.fullname,
+          fullname: user.fullname,
           uid: userCredential.user.uid,
           email: userCredential.user.email
         };
 
         this.firestore.doc(`${userDocument.uid}/user`).set(userDocument);
         this.goToRoute('dashboard');
-        this.store.dispatch( new SetDisableLoadingAction() );
+        this.store.dispatch(new SetDisableLoadingAction());
 
       })
       .catch((error: any) => this.handlerError(error.message || 'Error'));
   }
 
   login(user: UserLoginDto): void {
-    this.store.dispatch( new SetEnableLoadingAction() );
+    this.store.dispatch(new SetEnableLoadingAction());
     this.authFire.auth.signInWithEmailAndPassword(user.email, user.password)
       .then((userCredentials: firebase.auth.UserCredential) => {
         this.goToRoute('dashboard');
-        this.store.dispatch( new SetDisableLoadingAction() );
+        this.store.dispatch(new SetDisableLoadingAction());
       })
       .catch(error => this.handlerError(error.message || 'Error'));
   }
 
   private goToRoute(...route: string[]): void {
-    this.router.navigate( route );
+    this.router.navigate(route);
   }
 
   private handlerError(error: string) {
-    console.log(error);
+    this.logger.log(error);
     Swal.fire('Ocurrió un error', error, 'error');
-    this.store.dispatch( new SetDisableLoadingAction() );
+    this.store.dispatch(new SetDisableLoadingAction());
   }
 
   logout() {
@@ -109,7 +118,7 @@ export class AuthService {
       .pipe(
         map((userCredentials: firebase.User) => {
           const user = (userCredentials != null);
-          if ( !user ) { this.goToRoute('login'); }
+          if (!user) { this.goToRoute('login'); }
           return user;
         })
       );

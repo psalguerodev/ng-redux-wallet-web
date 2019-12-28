@@ -10,12 +10,12 @@
           <div class="float-right">
             <p class="mb-0 text-right">Ingresos</p>
             <div class="fluid-container">
-              <h3 class="font-weight-medium text-right mb-0">$65,650</h3>
+              <h3 class="font-weight-medium text-right mb-0">{{ items | count: 'input': false | currency }}</h3>
             </div>
           </div>
         </div>
         <p class="text-muted mt-3 mb-0">
-          <i class="mdi mdi-alert-octagon mr-1" aria-hidden="true"></i> 65% lower growth
+          <i class="mdi mdi-alert-octagon mr-1" aria-hidden="true"></i> {{ items | count: 'input': true }} Ingresos
         </p>
       </div>
     </div>
@@ -30,16 +30,47 @@
             <i class="fa fa-shipping-fast text-danger icon-lg"></i>
           </div>
           <div class="float-right">
-            <p class="mb-0 text-right">Ingresos</p>
+            <p class="mb-0 text-right">Salidas</p>
             <div class="fluid-container">
-              <h3 class="font-weight-medium text-right mb-0">$65,650</h3>
+              <h3 class="font-weight-medium text-right mb-0">{{ items | count: 'output': false | currency }}</h3>
             </div>
           </div>
         </div>
         <p class="text-muted mt-3 mb-0">
-          <i class="mdi mdi-alert-octagon mr-1" aria-hidden="true"></i> 65% lower growth
+          <i class="mdi mdi-alert-octagon mr-1" aria-hidden="true"></i> {{ items | count: 'output': true }} Egresos
         </p>
       </div>
     </div>
   </div>
+</div>
+
+<div class="row m-5">
+
+  <div class="col-12 p-5" *ngIf="items.length > 0">
+    <div class="card card-statistics">
+      <div class="card-body">
+        <h1 class="card-title">Gráfica</h1>
+
+         <div class="chart-container">
+            <ngx-charts-bar-horizontal
+              [scheme]="colorScheme"
+              [results]="results"
+              [gradient]="gradient"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="showLegend"
+              [showGridLines]="false"
+              [showXAxisLabel]="showXAxisLabel"
+              [showDataLabel]="true"
+              [showYAxisLabel]="showYAxisLabel"
+              [xAxisLabel]="xAxisLabel"
+              [yAxisLabel]="yAxisLabel"
+              class="my-chart">
+            </ngx-charts-bar-horizontal>
+         </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
