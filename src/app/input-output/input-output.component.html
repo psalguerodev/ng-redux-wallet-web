@@ -27,24 +27,26 @@
             <label>Tipo</label>
             <br>
 
-            <button *ngIf="type === 'input'" (click)="type = 'output'" type="button" class="btn btn-primary btn-block">
+            <button *ngIf="type === 'input'" (click)="type = 'output'" type="button"
+                    class="btn btn-outline-info btn-block col-3">
               Ingreso
             </button>
 
-            <button *ngIf="type === 'output'" (click)="type = 'input'" type="button" class="btn btn-warning btn-block">
+            <button *ngIf="type === 'output'" (click)="type = 'input'" type="button"
+                    class="btn btn-outline-warning btn-block col-3">
               Egreso
             </button>
           </div>
 
           <hr>
 
-          <button *ngIf="!loading" type="submit" class="btn btn-success mr-2" [disabled]="form.invalid">
+          <button *ngIf="!loading" type="submit" class="btn btn-info mr-2" [disabled]="form.invalid">
             <i class="fa fa-save"></i>
             Agregar
           </button>
 
 
-          <button *ngIf="loading" disabled class="btn btn-success mr-2">
+          <button *ngIf="loading" disabled class="btn btn-info mr-2">
             <i class="fa fa-spin fa-sync"></i>
             Espere por favor...
           </button>

@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+import Swal from 'sweetalert2';
+import { DashboardState } from '../input-output.reducer';
 import { InputOutput } from '../model/input-output.model';
 import { InputOutputService } from '../services/input-output.service';
-import { AppState } from '../../app.reducer';
-import { Subscription } from 'rxjs';
-import { Store } from '@ngrx/store';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'psalguerodev-detail',
@@ -18,7 +18,7 @@ export class DetailComponent implements OnInit, OnDestroy {
 
   constructor(
     private ioService: InputOutputService,
-    private store: Store<AppState>
+    private store: Store<DashboardState>
   ) { }
 
   ngOnInit() {
@@ -33,7 +33,7 @@ export class DetailComponent implements OnInit, OnDestroy {
   deleteItem(item: InputOutput): void {
     this.ioService
       .deleteItemById(item.id)
-      .then(() => Swal.fire('Elimanado', item.description, 'success'));
+      .then(() => Swal.fire('Eliminado', item.description, 'success'));
   }
 
 }

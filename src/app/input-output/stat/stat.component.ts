@@ -1,10 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState } from 'src/app/app.reducer';
 import { InputOutput } from '../model/input-output.model';
 import { Subscription } from 'rxjs';
 import { DataChart } from './model/chart.model';
-import { IOState } from '../input-output.reducer';
+import { IOState, DashboardState } from '../input-output.reducer';
 import { CountPipe } from '../pipes/count.pipe';
 
 @Component({
@@ -21,18 +20,18 @@ export class StatComponent implements OnInit, OnDestroy {
   // Options
   showXAxis = true;
   showYAxis = true;
-  gradient = true;
+  gradient = false;
   showLegend = false;
   showXAxisLabel = true;
   xAxisLabel = 'Montos';
   showYAxisLabel = true;
   yAxisLabel = 'Tipos';
-  colorScheme = 'ocean';
+  colorScheme = 'aqua';
 
   results: DataChart[] = [];
   countPipe: CountPipe  = new CountPipe();
 
-  constructor(private store: Store<AppState>) { }
+  constructor(private store: Store<DashboardState>) { }
 
   ngOnInit() {
     this.itemsSubscription = this.store.select('io')
@@ -45,6 +44,9 @@ export class StatComponent implements OnInit, OnDestroy {
 
   handleIoState(ioState: IOState): void {
     this.items = ioState.items;
+    console.log(this.items)
+    console.log(ioState)
+    
     const inputs: DataChart = {
       name: 'Entrada',
       value: this.countPipe.transform(this.items, 'input', false)

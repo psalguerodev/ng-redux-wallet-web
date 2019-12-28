@@ -1,9 +1,14 @@
 import { InputOutput } from './model/input-output.model';
 import { IOActions, SET_ITEM_ACTION, UNSET_ITEM_ACTION } from './input-output.actions';
+import { AppState } from '../app.reducer';
 
 export interface IOState {
   items: InputOutput[]
 };
+
+export interface DashboardState extends AppState {
+  io: IOState;
+}
 
 const initIOState: IOState = {
   items: []
