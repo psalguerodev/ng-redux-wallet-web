@@ -6,7 +6,7 @@ import { filter, map } from 'rxjs/operators';
 import { AppState } from 'src/app/app.reducer';
 import { AuthService } from '../../auth/services/auth.service';
 import { InputOutput } from '../model/input-output.model';
-import { SetItemIOAction } from '../input-output.actions';
+import { SetItemIOAction, UnsetItemIOAction } from '../input-output.actions';
 import { LoggerService } from '../../shared/services/logger.service';
 
 
@@ -59,6 +59,7 @@ export class InputOutputService {
   unsubscribeItems(): void {
     this.authSubscription.unsubscribe();
     this.ioSubscription.unsubscribe();
+    this.store.dispatch(new UnsetItemIOAction())
   }
 
   createInputOutput(inputOutput: InputOutput): Promise<DocumentReference> {

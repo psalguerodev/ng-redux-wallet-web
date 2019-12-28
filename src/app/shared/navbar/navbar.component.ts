@@ -4,6 +4,7 @@ import { User } from '../../auth/model/user.model';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.reducer';
+import { map, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'psalguerodev-navbar',
@@ -12,14 +13,15 @@ import { AppState } from 'src/app/app.reducer';
 })
 export class NavbarComponent implements OnInit, OnDestroy {
 
-  user: User;
+  fullname: string;
   userSubscription: Subscription;
 
   constructor(private store: Store<AppState>) { }
 
   ngOnInit() {
     this.userSubscription = this.store.select('auth')
-      .subscribe((userState) => this.user = userState.user);
+      .pipe(filter( authState => authState.user != null))
+      .subscribe((authState) => this.fullname = authState.user.fullname);
   }
 
   ngOnDestroy() {

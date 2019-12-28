@@ -1,4 +1,4 @@
-import { UserActions, SET_USER_ACTION } from './auth.actions';
+import { UserActions, SET_USER_ACTION, UNSET_USER_ACTION } from './auth.actions';
 import { User } from '../model/user.model';
 
 export interface AuthState {
@@ -17,6 +17,9 @@ export function authReducer(state = userInitState, action: UserActions): AuthSta
           ...action.user
         }
       }
+
+    case UNSET_USER_ACTION:
+        return { user: null }
 
     default:
       return state;

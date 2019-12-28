@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import * as firebase from 'firebase';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import Swal from 'sweetalert2';
-import { User } from '../model/user.model';
-import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.reducer';
-import { SetEnableLoadingAction, SetDisableLoadingAction } from '../../shared/sidebar/ui.actions';
-import { SetUserAction } from '../ngrx/auth.actions';
+import Swal from 'sweetalert2';
 import { LoggerService } from '../../shared/services/logger.service';
+import { SetDisableLoadingAction, SetEnableLoadingAction } from '../../shared/sidebar/ui.actions';
+import { User } from '../model/user.model';
+import { SetUserAction, UnsetUserAction } from '../ngrx/auth.actions';
 
 export interface UserRegisterDto {
   id?: string;
@@ -110,7 +110,7 @@ export class AuthService {
   logout() {
     this.goToRoute('login');
     this.authFire.auth.signOut();
-    this.store.dispatch(new SetUserAction(null));
+    this.store.dispatch(new UnsetUserAction());
   }
 
   isAuthenticate(): Observable<boolean> {
